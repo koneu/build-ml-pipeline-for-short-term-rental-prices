@@ -7,6 +7,11 @@ import wandb
 import hydra
 from omegaconf import DictConfig
 
+_env_manager = "conda" if shutil.which("conda") else "local"
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
+logger = logging.getLogger()
+
 _steps = [
     "download",
     "basic_cleaning",
@@ -50,10 +55,19 @@ def go(config: DictConfig):
             )
 
         if "basic_cleaning" in active_steps:
-            ##################
-            # Implement here #
-            ##################
-            pass
+            cfg = config["etl"]["basic_cleaning"]
+            _ = mlflow.run(
+                os.path.join(hydra.utils.get_original_cwd(), "src", "basic_cleaning"),
+                "main",
+                env_manager=_env_manager,
+                parameters={
+                    "dirty_artifact": cfg["input_artifact"],
+                    "clean_artifact": cfg["output_artifact"],
+                    "artifact_type": cfg["output_type"],
+                    "artifact_description": "Basic cleaned dataset",
+                    "filters": json.dumps([list(f) for f in cfg["filters"]]),
+                },
+            )
 
         if "data_check" in active_steps:
             ##################
