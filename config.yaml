@@ -10,7 +10,7 @@ etl:
     job_type: "eda"
   download:
     job_type: "download_file"
-    sample: "sample1.csv"
+    sample: "sample2.csv"
     output_artifact: "sample.csv"
     output_type: "raw_data"
     output_desc: "Raw file as downloaded"
@@ -23,8 +23,8 @@ etl:
       - [price, 10, 350]
       #- [minimum_nights, 1, 365]
       #- [availability_365, 1, null]
-      #- [longitude, -74.25, -73.50]
-      #- [latitude, 40.5, 41.2]
+      - [longitude, -74.25, -73.50]
+      - [latitude, 40.5, 41.2]
   data_check:
     input_artifact: "clean_sample.csv:latest"
     ref_artifact: "clean_sample.csv:latest"
