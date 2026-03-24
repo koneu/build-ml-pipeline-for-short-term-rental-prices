@@ -1,0 +1,54 @@
+[project]
+name = "nyc-airbnb-dev"
+version = "0.1.0"
+description = "NYC Airbnb ML Pipeline"
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+    "ignore::UserWarning:pydantic",
+]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+# --- Default (dev) environment — from environment.yml ---
+[tool.pixi.dependencies]
+python = "3.13.*"
+hydra-core = "1.3.2.*"
+matplotlib = "<=3.10.0"
+pandas = "2.3.2.*"
+jupyterlab = "4.4.7.*"
+cookiecutter = "2.6.0.*"
+packaging = "<26"
+setuptools = ">=65.5.0,<70"
+numpy = ">=2.0,<2.2"
+pytest = "8.4.2.*"
+
+[tool.pixi.activation]
+scripts = ["activate.sh"]
+
+[tool.pixi.pypi-dependencies]
+mlflow = "==3.3.2"
+wandb = "==0.21.3"
+ydata-profiling = ">=4.17.0"
+hydra-optuna-sweeper = ">=1.1.0"
+ipywidgets = "==8.1.7"
+wandb-utils = { path = "components/", editable = true }
+
+[tool.pixi.tasks]
+new-step = { cmd = "cookiecutter cookie-mlflow-step -o .", description = "Scaffold a new MLFlow step from the cookiecutter template" }
+mlflow = { cmd = "mlflow run --env-manager=local", description = "Run an MLFlow step, e.g: pixi run mlflow-run src/basic_cleaning" }
+run = { cmd = "python main.py", description = "Run the full ML pipeline" }
+sweep = { cmd = "python main.py --multirun 'main.steps=train_random_forest' 'hydra/sweeper=optuna'", description = "Hyperparameter sweep over train_random_forest using Optuna, append params e.g: pixi run sweep 'modeling.random_forest.max_depth=5,10,15'" }
+# pixi run sweep "modeling.random_forest.max_depth=5,10,15" "modeling.random_forest.n_estimators=50,100,200"
+
+# --- Components feature — from conda.yml ---
+[tool.pixi.feature.components.dependencies]
+pyyaml = "*"
+
+[tool.pixi.environments]
+default = { features = [], solve-group = "default" }
+components = { features = ["components"], solve-group = "default" }

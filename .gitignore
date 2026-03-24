@@ -113,3 +113,8 @@ mlruns/
 outputs/
 random_forest_dir/
 multirun/
+
+rf_config.json
+pixi.lock
+
+
